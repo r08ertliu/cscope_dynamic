@@ -193,6 +193,7 @@ function! s:dbUpdate()
             let cmd .=       " -name *.cxx -or -name *.hxx -or"
             let cmd .=       " -name *.cc  -or -name *.hh -or"
             let cmd .=       " -name *.cpp -or -name *.hpp"
+            let cmd .=       " -name *.cu  -or -name *.cuh -or"
             let cmd .=       " \\) 2>/dev/null"
         else
             let cmd .= "echo "  " dummy so following cat command does not hang.
@@ -344,9 +345,9 @@ endfunction
 function! s:installAutoCommands()
     augroup cscopedb_augroup
         au!
-        au BufWritePre *.[cChH],*.[cChH]{++,xx,pp} call <SID>smallListUpdate(expand("<afile>"))
-        au BufWritePost *.[cChH],*.[cChH]{++,xx,pp} call <SID>dbUpdate()
-        au FileChangedShellPost *.[cChH],*.[cChH]{++,xx,pp} call <SID>dbFullUpdate()
+        au BufWritePre *.[cChH],*.[cChH]{++,xx,pp},*.cu,*.cuh call <SID>smallListUpdate(expand("<afile>"))
+        au BufWritePost *.[cChH],*.[cChH]{++,xx,pp},*.cu,*.cuh call <SID>dbUpdate()
+        au FileChangedShellPost *.[cChH],*.[cChH]{++,xx,pp},*.cu,*.cuh call <SID>dbFullUpdate()
         au QuickFixCmdPre,CursorHoldI,CursorHold,WinEnter,CursorMoved * call <SID>dbTick()
     augroup END
 endfunction
