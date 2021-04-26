@@ -192,8 +192,8 @@ function! s:dbUpdate()
             let cmd .=       " -name *.c++ -or -name *.h++ -or"
             let cmd .=       " -name *.cxx -or -name *.hxx -or"
             let cmd .=       " -name *.cc  -or -name *.hh -or"
-            let cmd .=       " -name *.cpp -or -name *.hpp"
-            let cmd .=       " -name *.cu  -or -name *.cuh -or"
+            let cmd .=       " -name *.cpp -or -name *.hpp -or"
+            let cmd .=       " -name *.cu  -or -name *.cuh"
             let cmd .=       " \\) 2>/dev/null"
         else
             let cmd .= "echo "  " dummy so following cat command does not hang.
