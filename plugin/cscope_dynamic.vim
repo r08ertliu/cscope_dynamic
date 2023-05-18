@@ -1,5 +1,3 @@
-" vim: set foldmethod=marker:
-"
 " Copyright (c) 2014, Eric Garver
 " All rights reserved.
 "
