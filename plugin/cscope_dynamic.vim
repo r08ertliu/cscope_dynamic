@@ -182,8 +182,10 @@ function! s:dbUpdate()
 			" Do the find command a 'portable' way
 			let cmd .= "find ".src_dirs." "
 			let cmd .= "-not -path */build/* "
-			let cmd .= "-not -path */debug/* "
-			let cmd .= "-not -path */release/* "
+			let cmd .= "-not -path */debug*/* "
+			let cmd .= "-not -path */release*/* "
+			let cmd .= "-not -path */3rd_party/grpc/* "
+			let cmd .= "-not -path */3rd_party/spdk/* "
 			let cmd .= "-type f "
 			let cmd .= "-and \\("
 			let cmd .=       " -name *.c   -or -name *.h -or"
