@@ -348,9 +348,9 @@ endfunction
 function! s:installAutoCommands()
 	augroup cscopedb_augroup
 		au!
-		au BufWritePre *.[cChH],*.[cChH]{++,xx,pp},*.cu,*.cuh call <SID>smallListUpdate(expand("<afile>"))
-		au BufWritePost *.[cChH],*.[cChH]{++,xx,pp},*.cu,*.cuh call <SID>dbUpdate()
-		au FileChangedShellPost *.[cChH],*.[cChH]{++,xx,pp},*.cu,*.cuh call <SID>dbFullUpdate()
+		au BufWritePre *.[cChH],*.[cChH]{++,xx,pp},*.cc,*.cu,*.cuh call <SID>smallListUpdate(expand("<afile>"))
+		au BufWritePost *.[cChH],*.[cChH]{++,xx,pp},*.cc,*.cu,*.cuh call <SID>dbUpdate()
+		au FileChangedShellPost *.[cChH],*.[cChH]{++,xx,pp},*.cc,*.cu,*.cuh call <SID>dbFullUpdate()
 		au QuickFixCmdPre,CursorHoldI,CursorHold,WinEnter,CursorMoved * call <SID>dbTick()
 	augroup END
 endfunction
