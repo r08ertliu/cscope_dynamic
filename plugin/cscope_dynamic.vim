@@ -106,11 +106,27 @@ function! s:runShellCommand(cmd)
 	endif
 endfunction
 
+function! s:getLock(wait)
+	while filereadable(expand(s:lock_file))
+		if !a:wait
+			return 0
+		endif
+	endwhile
+	" FIXME: Still may race here
+	call s:runShellCommand("touch ".s:lock_file)
+	return 1
+endfunction
+
+function! s:putLock()
+	call s:runShellCommand("rm ".s:lock_file)
+endfunction
+
 " Add the file to the small DB file list. {{{2
 " This moves the file to the small cscope DB and triggers an update
 " of the necessary databases.
 "
 function! s:smallListUpdate(file)
+	call s:getLock(1)
 	let s:small_update = 1
 
 	" If file moves to small DB then we also do a big DB update so
@@ -125,16 +141,13 @@ function! s:smallListUpdate(file)
 		let s:big_update = 1
 		call writefile(keys(s:small_file_dict), expand(s:small_file) . ".files")
 	endif
+	call s:putLock()
 endfunction
 
 " Update any/all of the DBs {{{2
 "
 function! s:dbUpdate()
 	if s:small_update != 1 && s:big_update != 1
-		return
-	endif
-
-	if filereadable(expand(s:lock_file))
 		return
 	endif
 
@@ -148,8 +161,9 @@ function! s:dbUpdate()
 
 	let cmd = ""
 
-	" Touch lock file synchronously
-	call s:runShellCommand("touch ".s:lock_file)
+	if !s:getLock(0)
+		return
+	endif
 
 	" Do small update first. We'll do big update
 	" after the small updates are done.
@@ -162,7 +176,6 @@ function! s:dbUpdate()
 			let cmd .= "-U "
 		endif
 		let cmd .= "-i".s:small_file.".files -f".s:small_file
-		let cmd .= "; rm ".s:lock_file
 		let cmd .= ") &>/dev/null &"
 
 		let s:small_update = 2
@@ -235,7 +248,6 @@ function! s:dbUpdate()
 			let cmd .= "-U "
 		endif
 		let cmd .= "-i".s:big_file.".files -f".s:big_file
-		let cmd .= "; rm ".s:lock_file
 		let cmd .= ") &>/dev/null &"
 
 		let s:big_update = 2
@@ -243,6 +255,7 @@ function! s:dbUpdate()
 	endif
 
 	call s:runShellCommand(cmd)
+	call s:putLock()
 
 	let s:needs_reset = 1
 	if exists("*Cscope_dynamic_update_hook")
@@ -254,7 +267,7 @@ endfunction
 " updated/created and the update has finished.
 "
 function! s:dbReset()
-	if !s:needs_reset || filereadable(expand(s:lock_file))
+	if !s:needs_reset || !s:getLock(0)
 		return
 	endif
 
@@ -286,6 +299,7 @@ function! s:dbReset()
 			call Cscope_dynamic_update_hook(0)
 		endif
 	endif
+	call s:putLock()
 endfunction
 
 function! s:dbTick()
@@ -351,7 +365,7 @@ function! s:installAutoCommands()
 		au BufWritePre *.[cChH],*.[cChH]{++,xx,pp},*.cc,*.cu,*.cuh call <SID>smallListUpdate(expand("<afile>"))
 		au BufWritePost *.[cChH],*.[cChH]{++,xx,pp},*.cc,*.cu,*.cuh call <SID>dbUpdate()
 		au FileChangedShellPost *.[cChH],*.[cChH]{++,xx,pp},*.cc,*.cu,*.cuh call <SID>dbFullUpdate()
-		au QuickFixCmdPre,CursorHoldI,CursorHold,WinEnter,CursorMoved * call <SID>dbTick()
+		au QuickFixCmdPre,WinEnter,CursorMoved * call <SID>dbTick()
 	augroup END
 endfunction
 
