@@ -99,6 +99,8 @@ function! s:runShellCommand(cmd)
 	"
 	if has('perl')
 		silent execute "perl system('" . a:cmd . "')" | redraw!
+	elseif has('python3')
+		silent execute "python3 import subprocess; subprocess.call(\"" . a:cmd . "\", shell=True)" | redraw!
 	else
 		silent execute "!" . a:cmd | redraw!
 	endif
