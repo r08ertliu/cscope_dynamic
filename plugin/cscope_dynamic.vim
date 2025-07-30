@@ -189,7 +189,7 @@ function! s:dbUpdate()
 			let cmd .= "-not -path */3rd_party/grpc/* "
 			let cmd .= "-not -path */3rd_party/spdk/* "
 			let cmd .= "-type f "
-			let cmd .= "-and \\("
+			let cmd .= "-and \\\\("
 			let cmd .=       " -name *.c   -or -name *.h -or"
 			let cmd .=       " -name *.C   -or -name *.H -or"
 			let cmd .=       " -name *.c++ -or -name *.h++ -or"
@@ -197,7 +197,7 @@ function! s:dbUpdate()
 			let cmd .=       " -name *.cc  -or -name *.hh -or"
 			let cmd .=       " -name *.cpp -or -name *.hpp -or"
 			let cmd .=       " -name *.cu  -or -name *.cuh"
-			let cmd .=       " \\) 2>/dev/null"
+			let cmd .=       " \\\\) 2>/dev/null"
 		else
 			let cmd .= "echo "  " dummy so following cat command does not hang.
 		endif
